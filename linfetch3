@@ -27,7 +27,7 @@ echo "        /____//____/ for Darwin";
 
 echo "${USER}@"$(hostname)"
 ---
-os/distro | $NAME
+os/distro | $(uname -s) $(uname -r)
 shell     | ${SHELL##*/}
 kernel    | $(uname -r)
 uptime    | up $days days, $hours hours, $minutes minutes
