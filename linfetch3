@@ -1,25 +1,38 @@
 #!/bin/bash
 
-# I don't have anything here yet lmao
-disk_info=$(df -h | awk 'NR==2 {print $3"/"$2}')
-. /etc/os-release
-#pick your own file
+# This script gives me depression
+
+uptime_seconds=$(sysctl -n kern.boottime | awk -F'[ ,]' '{print $4}' | tr -d '\n')
+
+current_time=$(date +%s)
+
+uptime_seconds=$((current_time - uptime_seconds))
+
+days=$((uptime_seconds / 86400))
+hours=$((uptime_seconds % 86400 / 3600))
+minutes=$((uptime_seconds % 3600 / 60))
+
+MemInfo=$(top -l 1 | awk '/PhysMem:/ {print $2, $6}' | xargs)
+
+
+UsedGB=$(echo $MemInfo | awk '{printf "%.2f", $1 / 1024}')
+TotalGB=$(echo $MemInfo | awk '{printf "%.2f", ($1 + $2) / 1024}')
 
 echo "    _                   __     ";
 echo "   (_)___  ____ ___  __/ /____ ";
 echo "  / / __ \/ __ \`/ / / / __/ _ \ ";
 echo " / / / / / /_/ / /_/ / /_/  __/";
 echo "/_/_/ /_/\__, /\__, /\__/\___/ ";
-echo "        /____//____/ SUITE     ";
+echo "        /____//____/ for Darwin";
 
 echo "${USER}@"$(hostname)"
 ---
 os/distro | $NAME
 shell     | ${SHELL##*/}
 kernel    | $(uname -r)
-uptime    | $(uptime -p)
+uptime    | up $days days, $hours hours, $minutes minutes
 arch      | $(uname -m)
 res(total)| $(xdpyinfo | awk '/dimensions/{print $2}')
-cpu       | $(lscpu | grep 'Model name' | awk '{print $3" "$4" "$5" "$6" "$7" "$8" "$9" "$10" "$11" "$12}')
-memory    | $(free -h | awk '/^Mem/ {print $3 "/" $2}')
-disk      | $disk_info"
+cpu       | $(sysctl -n machdep.cpu.brand_string)
+memory    |" ${UsedGB}"/"${TotalGB}"
+disk      |" $(df -h | awk 'NR==2 {print $3"/"$2}')""
